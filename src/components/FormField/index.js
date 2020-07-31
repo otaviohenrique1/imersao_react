@@ -73,11 +73,12 @@ const Input = styled.input`
 // }
 // + -. proximo seletor
 
-function FormField({ label, type, value, name, onChange }) {
+function FormField({ label, type, value, name, onChange, suggestions }) {
     const fieldId = `id_${name}`;
     const isTextArea = type === 'textarea';
     const tag = isTextArea ? 'textarea' : 'input';
     const hasValue = Boolean(value.length);
+    const hasSuggestions = Boolean(suggestions.length);
 
     return (
         <FormFieldWrapper>
@@ -92,10 +93,21 @@ function FormField({ label, type, value, name, onChange }) {
                     name={name}
                     hasValue={hasValue}
                     onChange={onChange}
+                    autoComplete={hasSuggestions ? 'off' : 'on'}
+                    list={hasSuggestions ? `suggestionFor_${fieldId}` : undefined}
                 />
                 <Label.Text>
                     {label}
                 </Label.Text>
+                {hasSuggestions && (
+                    <datalist id={`suggestionFor_${fieldId}`}>
+                        {suggestions.map((suggestion) => (
+                            <option key={`suggestionFor_${fieldId}_option${suggestion}`} value={suggestion}>
+                                {suggestions}
+                            </option>
+                        ))}
+                    </datalist>
+                )}
             </Label>
         </FormFieldWrapper>
     );
@@ -105,6 +117,7 @@ FormField.defaultProps = {
     type: 'text',
     value: '',
     onChange: () => {},
+    suggestions: []
 };
 
 FormField.propTypes = {
@@ -113,6 +126,7 @@ FormField.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.string,
     onChange: PropTypes.func,
+    suggestions: PropTypes.arrayOf(PropTypes.string),
 }
 
 export default FormField;
